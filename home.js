@@ -11,7 +11,6 @@ let remoteSongs = [];
 let activeView = "home";
 
 const $ = selector => document.querySelector(selector);
-
 const $$ = selector => [...document.querySelectorAll(selector)];
 
 
@@ -83,17 +82,9 @@ function normalizeRemoteSong(song) {
   ).trim();
 
   if (!id || !title || !video) return null;
-
   if (!["happy", "sad"].includes(category)) return null;
 
-  return {
-    id,
-    title,
-    artist,
-    category,
-    video,
-    cover
-  };
+  return { id, title, artist, category, video, cover };
 }
 
 
@@ -122,16 +113,13 @@ function removeDuplicateSongs(list) {
 
     const title = normalizeText(song.title);
     const artist = normalizeText(song.artist);
-
     const titleArtist = `${title}-${artist}`;
 
     if (
       seenIds.has(id) ||
       seenVideos.has(video) ||
       seenTitles.has(titleArtist)
-    ) {
-      return false;
-    }
+    ) return false;
 
     seenIds.add(id);
     seenVideos.add(video);
@@ -147,48 +135,32 @@ function removeDuplicateSongs(list) {
 // ======================================
 
 function loadRemoteSongs() {
-
   return new Promise(resolve => {
-
     const callbackName = "musicLabSongsCallback";
-
     const script = document.createElement("script");
-
     let finished = false;
 
-    const timeout = setTimeout(() => {
-      finish(false);
-    }, 15000);
-
+    const timeout = setTimeout(() => finish(false), 15000);
 
     function finish(success) {
-
       if (finished) return;
 
       finished = true;
-
       clearTimeout(timeout);
-
       delete window[callbackName];
-
       script.remove();
 
       $("#loadingState").hidden = true;
-
       $("#loadError").hidden = success;
 
       updateCounts();
-
       renderPersonalSections();
-
       applySearch();
 
       resolve(remoteSongs);
     }
 
-
     window[callbackName] = response => {
-
       const list = Array.isArray(response)
         ? response
         : response?.songs || response?.data || [];
@@ -204,30 +176,19 @@ function loadRemoteSongs() {
 
       remoteSongs = removeDuplicateSongs(normalized);
 
-
-      // Clear old cards before rendering new songs
-
       $(".allhappysongs").replaceChildren();
-
       $(".allsadsongs").replaceChildren();
 
-
-      // Add each song to its correct category
-
       remoteSongs.forEach(song => {
-
         const container = song.category === "happy"
           ? $(".allhappysongs")
           : $(".allsadsongs");
 
         container.appendChild(makeCard(song));
-
       });
-
 
       finish(true);
     };
-
 
     script.onerror = () => finish(false);
 
@@ -235,9 +196,7 @@ function loadRemoteSongs() {
       `${scriptURL}?action=songs&callback=${callbackName}&_=${Date.now()}`;
 
     document.body.appendChild(script);
-
   });
-
 }
 
 
@@ -246,26 +205,15 @@ function loadRemoteSongs() {
 // ======================================
 
 function makeCard(song, options = {}) {
-
   const card = document.createElement("article");
-
   card.className = "song-card";
-
   card.dataset.id = song.id;
-
   card.dataset.category = song.category || "";
 
-
-  // Cover image
-
   const img = document.createElement("img");
-
   img.className = "song-img";
-
   img.alt = song.title;
-
   img.loading = "lazy";
-
   img.src = song.cover || "images/ranimg.png";
 
   img.onerror = () => {
@@ -273,62 +221,35 @@ function makeCard(song, options = {}) {
     img.src = "images/ranimg.png";
   };
 
-
-  // Song information
-
   const info = document.createElement("div");
-
   info.className = "songinfo";
 
-
   const heading = document.createElement("h2");
-
   heading.textContent = song.title;
 
-
   const artist = document.createElement("p");
-
   artist.className = "artist";
-
   artist.textContent = "Artist: " + (song.artist || "Unknown");
 
-
-  // Play button
-
   const play = document.createElement("button");
-
   play.className = "play-btn";
-
   play.type = "button";
-
   play.textContent = "▶ Play";
 
   play.addEventListener("click", () => {
-
     location.href =
       "player.html?song=" + encodeURIComponent(song.id);
-
   });
 
-
   info.append(heading, artist, play);
-
   card.append(img, info);
-
 
   makeFavoriteButton(card, song.id);
 
-
-  // Recent history remove button
-
   if (options.recent) {
-
     const remove = document.createElement("button");
-
     remove.type = "button";
-
     remove.className = "remove-recent";
-
     remove.textContent = "Remove";
 
     remove.addEventListener("click", () => {
@@ -336,7 +257,6 @@ function makeCard(song, options = {}) {
     });
 
     card.append(remove);
-
   }
 
   return card;
@@ -348,25 +268,17 @@ function makeCard(song, options = {}) {
 // ======================================
 
 function isFavorite(id) {
-
   return readStore("musicFavorites")
     .some(song => song.id === id);
-
 }
 
-
 function makeFavoriteButton(card, id) {
-
   let button = card.querySelector(".favorite-btn");
 
   if (!button) {
-
     button = document.createElement("button");
-
     button.className = "favorite-btn";
-
     button.type = "button";
-
     button.setAttribute("aria-label", "Toggle favorite");
 
     button.addEventListener("click", () => {
@@ -374,48 +286,34 @@ function makeFavoriteButton(card, id) {
     });
 
     card.appendChild(button);
-
   }
 
   const active = isFavorite(id);
 
   button.classList.toggle("active", active);
-
   button.title = active
     ? "Remove from favorites"
     : "Add to favorites";
 
   button.textContent = active ? "♥" : "♡";
-
 }
 
-
 function toggleFavorite(id) {
-
   const song = remoteSongs.find(s => s.id === id);
-
   if (!song) return;
 
   let favorites = readStore("musicFavorites");
 
   if (favorites.some(s => s.id === id)) {
-
     favorites = favorites.filter(s => s.id !== id);
-
     toast("Removed from Favorites.");
-
   } else {
-
     favorites.unshift(song);
-
     toast("Added to Favorites.");
-
   }
 
   writeStore("musicFavorites", favorites);
-
   renderPersonalSections();
-
 }
 
 
@@ -424,27 +322,18 @@ function toggleFavorite(id) {
 // ======================================
 
 function removeRecent(id) {
-
   const recent = readStore("musicRecent")
     .filter(song => song.id !== id);
 
   writeStore("musicRecent", recent);
-
   renderPersonalSections();
-
   toast("Song removed from history.");
-
 }
 
-
 function clearRecent() {
-
   writeStore("musicRecent", []);
-
   renderPersonalSections();
-
   toast("Listening history cleared.");
-
 }
 
 
@@ -453,31 +342,21 @@ function clearRecent() {
 // ======================================
 
 function renderPersonalSections() {
-
   const favorites = readStore("musicFavorites");
-
   const recent = readStore("musicRecent");
-
 
   $("#favoritesList").replaceChildren(
     ...favorites.map(song => makeCard(song))
   );
 
-
   $("#recentList").replaceChildren(
     ...recent.map(song => makeCard(song, { recent: true }))
   );
 
-
-  $("#favoritesCount").textContent =
-    `${favorites.length} songs`;
-
-  $("#recentCount").textContent =
-    `${recent.length} songs`;
-
+  $("#favoritesCount").textContent = `${favorites.length} songs`;
+  $("#recentCount").textContent = `${recent.length} songs`;
 
   applyView();
-
 }
 
 
@@ -486,15 +365,11 @@ function renderPersonalSections() {
 // ======================================
 
 function updateCounts() {
-
   const happy = $$(".allhappysongs .song-card").length;
-
   const sad = $$(".allsadsongs .song-card").length;
 
   $("#happyCount").textContent = `${happy} songs`;
-
   $("#sadCount").textContent = `${sad} songs`;
-
 }
 
 
@@ -503,7 +378,6 @@ function updateCounts() {
 // ======================================
 
 function applyView() {
-
   const sections = {
     home: ["happySection", "sadSection"],
     happy: ["happySection"],
@@ -514,41 +388,30 @@ function applyView() {
 
   const allowed = sections[activeView] || sections.home;
 
-
   [
     "happySection",
     "sadSection",
     "favoritesSection",
     "recentSection"
   ].forEach(id => {
-
     const section = $("#" + id);
 
     if (!allowed.includes(id)) {
       section.hidden = true;
     }
-
   });
 
-
   if (allowed.includes("favoritesSection")) {
-
     $("#favoritesSection").hidden =
       readStore("musicFavorites").length === 0;
-
   }
-
 
   if (allowed.includes("recentSection")) {
-
     $("#recentSection").hidden =
       readStore("musicRecent").length === 0;
-
   }
 
-
   applySearch();
-
 }
 
 
@@ -557,26 +420,15 @@ function applyView() {
 // ======================================
 
 function applySearch() {
-
   const query = $("#musicSearch").value.trim().toLowerCase();
-
   let total = 0;
 
-
   const groups = [
-    {
-      id: "happySection",
-      selector: ".allhappysongs"
-    },
-    {
-      id: "sadSection",
-      selector: ".allsadsongs"
-    }
+    { id: "happySection", selector: ".allhappysongs" },
+    { id: "sadSection", selector: ".allsadsongs" }
   ];
 
-
   groups.forEach(group => {
-
     const section = $("#" + group.id);
 
     const cards = [
@@ -587,9 +439,7 @@ function applySearch() {
 
     let visible = 0;
 
-
     cards.forEach(card => {
-
       const text = (
         (card.querySelector("h2")?.textContent || "") +
         " " +
@@ -597,18 +447,13 @@ function applySearch() {
       ).toLowerCase();
 
       const match = text.includes(query);
-
       card.hidden = !match;
 
       if (match) visible++;
-
     });
 
-
     section.dataset.matches = visible;
-
   });
-
 
   const allowed = activeView === "happy"
     ? ["happySection"]
@@ -618,27 +463,18 @@ function applySearch() {
         ? ["happySection", "sadSection"]
         : [];
 
-
   allowed.forEach(id => {
-
     const section = $("#" + id);
-
     const visible = Number(section.dataset.matches || 0);
 
     section.hidden = visible === 0;
-
     total += visible;
-
   });
-
-
-  // Favorites and recent search
 
   if (
     activeView === "favorites" ||
     activeView === "recent"
   ) {
-
     const isFavorites = activeView === "favorites";
 
     const list = isFavorites
@@ -650,12 +486,9 @@ function applySearch() {
       : $("#recentSection");
 
     const cards = [...list.querySelectorAll(".song-card")];
-
     let visible = 0;
 
-
     cards.forEach(card => {
-
       const text = (
         (card.querySelector("h2")?.textContent || "") +
         " " +
@@ -665,19 +498,13 @@ function applySearch() {
       card.hidden = !text.includes(query);
 
       if (!card.hidden) visible++;
-
     });
 
-
     section.hidden = visible === 0;
-
     total += visible;
-
   }
 
-
   $("#noResults").hidden = !query || total > 0;
-
 }
 
 
@@ -686,7 +513,6 @@ function applySearch() {
 // ======================================
 
 $("#topbtn").addEventListener("click", () => {
-
   if (!remoteSongs.length) {
     toast("Music library is still loading!");
     return;
@@ -698,7 +524,6 @@ $("#topbtn").addEventListener("click", () => {
 
   location.href =
     "player.html?song=" + encodeURIComponent(song.id);
-
 });
 
 
@@ -717,33 +542,28 @@ $("#year").textContent = new Date().getFullYear();
 
 
 // ======================================
-// SONG REQUEST SYSTEM
+// SONG REQUEST SYSTEM + ADMIN ACCESS
 // ======================================
 
 const overlay = $("#requestoverlay");
-
 const form = $("#requestform");
-
 const status = $("#requeststatus");
-
 const submit = $("#submitrequest");
+
+// Disable browser's automatic required-field validation.
+// This lets the Admin password be checked first.
+form.noValidate = true;
 
 
 $("#requestbtn").addEventListener("click", () => {
-
   overlay.classList.add("active");
-
   status.textContent = "";
-
   $("#requestusername").focus();
-
 });
 
 
 function closeRequest() {
-
   overlay.classList.remove("active");
-
 }
 
 
@@ -751,107 +571,73 @@ $("#closeRequest").addEventListener("click", closeRequest);
 
 
 overlay.addEventListener("click", event => {
-
   if (event.target === overlay) {
     closeRequest();
   }
-
 });
 
 
 document.addEventListener("keydown", event => {
-
   if (event.key === "Escape") {
     closeRequest();
   }
-
 });
 
 
 form.addEventListener("submit", async event => {
-
   event.preventDefault();
 
-
+  // Read song field first
   const song = $("#songname").value.trim();
 
-
-  // Admin access
-
-  if (song.toLowerCase() === adminTrigger) {
-
+  // ADMIN ACCESS CHECK - BEFORE OTHER INPUTS
+  if (song.toLowerCase() === adminTrigger.toLowerCase()) {
     location.href = scriptURL + "?page=admin";
-
     return;
-
   }
 
-
+  // Normal song request data
   const data = {
-
     name: $("#requestusername").value.trim(),
-
     song,
-
     artist: $("#artistname").value.trim(),
-
     link: $("#songlink").value.trim(),
-
     category: $("#songcategory").value,
-
     message: $("#songmessage").value.trim()
-
   };
 
-
+  // Validate normal requests
   if (
     !data.name ||
     !data.song ||
     !["happy", "sad"].includes(data.category)
   ) {
-
     status.textContent =
       "Please complete all required fields.";
-
     return;
-
   }
 
-
   submit.disabled = true;
-
   submit.textContent = "Sending...";
-
   status.textContent = "";
 
-
   try {
-
     await fetch(scriptURL, {
-
       method: "POST",
-
       mode: "no-cors",
-
       headers: {
         "Content-Type": "text/plain;charset=utf-8"
       },
-
       body: JSON.stringify(data)
-
     });
-
 
     status.textContent =
       "Request sent for review. Thank you!";
 
     toast("Request submitted.");
-
     form.reset();
 
-
   } catch (error) {
-
     console.error(error);
 
     status.textContent =
@@ -859,15 +645,10 @@ form.addEventListener("submit", async event => {
 
     toast("Request failed.");
 
-
   } finally {
-
     submit.disabled = false;
-
     submit.textContent = "Submit Request";
-
   }
-
 });
 
 
@@ -883,31 +664,22 @@ loadRemoteSongs();
 // ======================================
 
 const sidebar = $("#sidebar");
-
 const menuToggle = $("#menuToggle");
-
 const mobileScrim = $("#mobileScrim");
 
 
 function closeSidebar() {
-
   sidebar.classList.remove("open");
-
   mobileScrim.classList.remove("show");
-
   menuToggle.setAttribute("aria-expanded", "false");
-
 }
 
 
 menuToggle.addEventListener("click", () => {
-
   const open = sidebar.classList.toggle("open");
 
   mobileScrim.classList.toggle("show", open);
-
   menuToggle.setAttribute("aria-expanded", String(open));
-
 });
 
 
@@ -919,20 +691,15 @@ mobileScrim.addEventListener("click", closeSidebar);
 // ======================================
 
 document.querySelectorAll(".nav-link").forEach(link => {
-
   link.addEventListener("click", () => {
-
     document.querySelectorAll(".nav-link").forEach(item => {
       item.classList.remove("active");
     });
 
     link.classList.add("active");
-
     closeSidebar();
 
-
     const section = link.dataset.section;
-
 
     activeView =
       section === "happySection" ? "happy" :
@@ -941,20 +708,14 @@ document.querySelectorAll(".nav-link").forEach(link => {
       section === "recentSection" ? "recent" :
       "home";
 
-
     applyView();
 
-
     if (activeView === "home") {
-
       $("#home").scrollIntoView({
         behavior: "smooth"
       });
-
       return;
-
     }
-
 
     const targetId =
       activeView === "happy" ? "happySection" :
@@ -962,12 +723,9 @@ document.querySelectorAll(".nav-link").forEach(link => {
       activeView === "favorites" ? "favoritesSection" :
       "recentSection";
 
-
     const target = $("#" + targetId);
 
-
     if (target.hidden) {
-
       toast(
         activeView === "favorites"
           ? "No saved favorites yet."
@@ -975,17 +733,12 @@ document.querySelectorAll(".nav-link").forEach(link => {
             ? "No listening history yet."
             : "No songs available in this category."
       );
-
     } else {
-
       target.scrollIntoView({
         behavior: "smooth"
       });
-
     }
-
   });
-
 });
 
 
@@ -1001,9 +754,7 @@ $("#clearHistory").addEventListener("click", clearRecent);
 // ======================================
 
 window.addEventListener("resize", () => {
-
   if (window.innerWidth > 760) {
     closeSidebar();
   }
-
 });
