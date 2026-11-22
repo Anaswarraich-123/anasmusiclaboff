@@ -856,6 +856,38 @@ footer a:hover {
   display: none !important;
 }
 
+/* TOPBAR FIX */
+.topbar-right {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+#mytxt {
+  margin: 0;
+  white-space: nowrap;
+  flex-shrink: 1;
+}
+
+#requestbtn {
+  flex-shrink: 0;
+}
+
+/* MOBILE */
+@media (max-width: 760px) {
+  .topbar-right {
+    flex-direction: row !important;
+    gap: 7px;
+  }
+
+  #mytxt {
+    max-width: 110px;
+    white-space: normal;
+  }
+}
+
 /* TABLET */
 
 @media (max-width: 1050px) {
