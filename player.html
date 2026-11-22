@@ -1,0 +1,96 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <meta name="theme-color" content="#0b0912"/>
+  <meta name="description" content="Listen to songs on Anas Music Lab."/>
+  <title>Anas Music Lab | Player</title>
+  <link href="favicon.svg" rel="icon" type="image/svg+xml"/>
+  <link href="player.css" rel="stylesheet"/>
+</head>
+<body>
+
+  <header class="player-topbar">
+    <a href="home.html" id="backhomebtn">
+      <span>←</span>
+      Back to Library
+    </a>
+
+    <div class="player-brand">
+      <span class="player-mark">A<span>M</span></span>
+      <span>Anas Music Lab</span>
+    </div>
+
+    <span class="topbar-caption">NOW PLAYING</span>
+  </header>
+
+  <main class="player-page">
+
+    <section aria-label="Music player" class="card">
+
+      <div aria-hidden="true" class="visualizer">
+        <i></i><i></i><i></i><i></i><i></i><i></i>
+        <i></i><i></i><i></i><i></i><i></i>
+      </div>
+      <button id="imagebtn">Image</button>
+      <button id="videobtn">Video</button>
+
+      <div class="artwork-wrap">
+
+        <video id="video" playsinline preload="metadata"></video>
+
+        <div aria-hidden="true" class="artwork-placeholder">
+          <span>♪</span>
+          <small>ANAS MUSIC LAB</small>
+        </div>
+
+        <img alt="Song cover" draggable="false" id="image"/>
+
+        <button aria-label="Toggle fullscreen" id="fullscreenbtn" type="button">
+          ⛶
+        </button>
+
+        <div class="loader" aria-label="Loading" role="status">
+          <div class="loader-spinner"></div>
+          <span>Loading</span>
+        </div>
+
+      </div>
+
+      <div class="track-details">
+        <span class="playing-label">
+          <span class="live-dot"></span>
+          NOW PLAYING
+        </span>
+
+        <p id="name">Song Name</p>
+
+        <button aria-label="Toggle favorite" id="favoritePlayer" type="button">
+          ♡ Add to Favorites
+        </button>
+      </div>
+
+      <div class="timeline">
+        <span id="currenttime">0:00</span>
+        <input aria-label="Song progress" id="progress"
+          max="100" min="0" step="any" type="range" value="0"/>
+        <span id="duration">0:00</span>
+      </div>
+
+      <div class="controls">
+        <button aria-label="Previous song" id="backbtn" type="button">|◀</button>
+        <button aria-label="Play or pause" id="playingbtn" type="button">▶</button>
+        <button aria-label="Next song" id="nextbtn" type="button">▶|</button>
+      </div>
+
+      <p aria-live="polite" id="playerstatus" role="status"></p>
+
+    </section>
+
+  </main>
+
+  <script src="player.js"></script>
+</body>
+</html>

@@ -1,0 +1,347 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Explore songs, build a favorites list, and enjoy Anas Music Lab."/>
+  <meta name="theme-color" content="#0b0912"/>
+  <meta property="og:title" content="Anas Music Lab 🎧"/>
+  <meta property="og:description" content="A place for every mood and melody."/>
+  <title>Anas Music Lab 🎧</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml"/>
+  <link rel="stylesheet" href="home.css"/>
+</head>
+
+<body>
+
+  <div class="mobile-scrim" id="mobileScrim"></div>
+
+  <aside class="sidebar" id="sidebar">
+
+    <a class="sidebar-brand" href="#home" aria-label="Anas Music Lab home">
+      <span class="brand-mark">
+        A<span>M</span>
+      </span>
+
+      <span class="brand-copy">
+        <strong>Anas Music Lab</strong>
+        <small>MUSIC FOR EVERY MOMENT</small>
+      </span>
+    </a>
+
+    <div class="sidebar-label">MENU</div>
+
+    <nav class="side-nav" aria-label="Main navigation">
+
+      <a class="nav-link active" data-section="home" href="#home">
+        <span class="nav-icon">⌂</span>
+        Home
+      </a>
+
+      <a class="nav-link" data-section="happySection" href="#happySection">
+        <span class="nav-icon">♫</span>
+        Happy / Chill 🔥
+      </a>
+
+      <a class="nav-link" data-section="sadSection" href="#sadSection">
+        <span class="nav-icon">♡</span>
+        Sad ❤️‍🩹
+      </a>
+
+      <a class="nav-link" data-section="favoritesSection" href="#favoritesSection">
+        <span class="nav-icon">♥</span>
+        Favorites
+      </a>
+
+      <a class="nav-link" data-section="recentSection" href="#recentSection">
+        <span class="nav-icon">◷</span>
+        Recently Played
+      </a>
+
+    </nav>
+
+    <div class="sidebar-bottom">
+      <div class="sidebar-label">MORE</div>
+
+      <div class="sidebar-note">
+        <span class="note-dot"></span>
+        <span>Made for music lovers</span>
+      </div>
+    </div>
+
+  </aside>
+
+  <div class="app-shell">
+
+    <header class="topbar">
+
+      <div class="topbar-left">
+
+        <button
+          class="menu-toggle"
+          id="menuToggle"
+          aria-label="Open navigation"
+          aria-expanded="false">
+          ☰
+        </button>
+
+        <div>
+          <span class="topbar-kicker">WELCOME BACK</span>
+          <span class="brand-small">Explore the collection</span>
+        </div>
+
+      </div>
+
+      <p id="mytxt">There Is No Your Favorite Song?</p>
+
+      <button id="requestbtn">
+        <span>＋</span>
+        Request a Song
+      </button>
+
+    </header>
+
+    <main>
+
+      <section class="topcard" id="home">
+
+        <img
+          src="images/ranimg.png"
+          alt="Music banner"
+          id="topimg"/>
+
+        <div class="hero-content">
+
+          <p class="eyebrow">MUSIC FOR EVERY MOMENT</p>
+
+          <h1 id="toptxt">
+            🎵 <span>Anas</span> Music Lab
+          </h1>
+
+          <p id="toptxt2">
+            A place for every mood and melody. 🎵
+          </p>
+
+          <button id="topbtn">
+            Shuffle Mix
+            <span>↗</span>
+          </button>
+
+        </div>
+
+      </section>
+
+      <section class="search-container">
+
+        <div class="search-box">
+
+          <span class="search-icon" aria-hidden="true">⌕</span>
+
+          <input
+            type="search"
+            id="musicSearch"
+            placeholder="Search songs or artists..."
+            autocomplete="off"/>
+
+        </div>
+
+      </section>
+
+      <div class="status-panel" id="loadingState">
+        <span class="spinner"></span>
+        Loading the music library...
+      </div>
+
+      <div class="status-panel error-panel" id="loadError" hidden>
+        Could not connect to the online music library. Please check your connection and try again.
+      </div>
+
+      <p class="status-panel" id="noResults" hidden>
+        No songs found. Try another song or artist. 🔎
+      </p>
+
+      <!-- FAVORITES -->
+
+      <section class="music-category" id="favoritesSection" hidden>
+
+        <div class="section-heading">
+
+          <h2 class="category-title">Favorites ❤️</h2>
+
+          <span class="song-count" id="favoritesCount">
+            0 songs
+          </span>
+
+        </div>
+
+        <hr class="category-line"/>
+
+        <div class="song-grid" id="favoritesList"></div>
+
+      </section>
+
+      <!-- RECENTLY PLAYED -->
+
+      <section class="music-category" id="recentSection" hidden>
+
+        <div class="section-heading">
+
+          <h2 class="category-title">Recently Played 🕘</h2>
+
+          <div class="section-actions">
+
+            <span class="song-count" id="recentCount">
+              0 songs
+            </span>
+
+            <button class="clear-history" id="clearHistory" type="button">
+              Clear history
+            </button>
+
+          </div>
+
+        </div>
+
+        <hr class="category-line"/>
+
+        <div class="song-grid" id="recentList"></div>
+
+      </section>
+
+      <!-- HAPPY SONGS -->
+
+      <section class="music-category" id="happySection">
+
+        <div class="section-heading">
+
+          <h2 class="category-title">Happy / Chill</h2>
+
+          <span class="song-count" id="happyCount">
+            0 songs
+          </span>
+
+        </div>
+
+        <hr class="category-line"/>
+
+        <!-- Songs Google Sheets se yahan load honge -->
+
+        <div class="song-grid allhappysongs"></div>
+
+      </section>
+
+      <!-- SAD SONGS -->
+
+      <section class="music-category" id="sadSection">
+
+        <div class="section-heading">
+
+          <h2 class="category-title">Sad</h2>
+
+          <span class="song-count" id="sadCount">
+            0 songs
+          </span>
+
+        </div>
+
+        <hr class="category-line"/>
+
+        <!-- Songs Google Sheets se yahan load honge -->
+
+        <div class="song-grid allsadsongs"></div>
+
+      </section>
+
+    </main>
+
+    <footer>
+      <span>
+        © <span id="year"></span> Anas Music Lab
+      </span>
+    </footer>
+
+  </div>
+
+  <!-- SONG REQUEST WINDOW -->
+
+  <div class="request-overlay" id="requestoverlay">
+
+    <div class="request-box">
+
+      <button id="closeRequest" aria-label="Close" type="button">
+        ✕
+      </button>
+
+      <h2>Request a Song 🎵</h2>
+
+      <p>
+        Share a track you would love to hear in the library.
+      </p>
+
+      <form id="requestform">
+
+        <input
+          id="requestusername"
+          type="text"
+          maxlength="100"
+          placeholder="Name *"
+          required/>
+
+        <input
+          id="songname"
+          type="text"
+          maxlength="150"
+          placeholder="Song title *"
+          required/>
+
+        <input
+          id="artistname"
+          type="text"
+          maxlength="150"
+          placeholder="Artist (optional)"/>
+
+        <input
+          id="songlink"
+          type="url"
+          maxlength="500"
+          placeholder="Song link (optional)"/>
+
+        <select id="songcategory" required>
+
+          <option value="">Choose a category *</option>
+
+          <option value="happy">
+            Happy / Chill 😎
+          </option>
+
+          <option value="sad">
+            Sad
+          </option>
+
+        </select>
+
+        <textarea
+          id="songmessage"
+          maxlength="500"
+          placeholder="Add a message (optional)">
+        </textarea>
+
+        <button id="submitrequest" type="submit">
+          Submit Request
+        </button>
+
+        <p id="requeststatus" aria-live="polite"></p>
+
+      </form>
+
+    </div>
+
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="home.js"></script>
+
+</body>
+</html>
